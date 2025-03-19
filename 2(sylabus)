@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <dirent.h>
+#include <fcntl.h>  // For close()
+
+int main() {
+    pid_t pid = fork(); // Create a child process
+
+    if (pid < 0) {
+        perror("Fork failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("Child Process: PID = %d\n", getpid());
+
+        // Execute "ls -l" using execvp
+        char *args[] = {"ls", "-l", NULL};
+        execvp(args[0], args);
+
+        // If exec fails
+        perror("Exec failed");
+        exit(EXIT_FAILURE);
+    } else {
+        // Parent process
+        printf("Parent Process: PID = %d, waiting for child...\n", getpid());
+
+        // Wait for the child process to finish
+        wait(NULL);
+        printf("Child process completed.\n");
+
+        // Open and read the current directory
+        int dir_fd;
+        DIR *dir = opendir(".");
+        if (!dir) {
+            perror("Failed to open directory");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("Files in the current directory:\n");
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            printf("%s\n", entry->d_name);
+        }
+
+        // Get directory file descriptor and close it using close()
+        dir_fd = dirfd(dir); 
+        closedir(dir);
+        
+        if (dir_fd != -1) {
+            close(dir_fd);  // Close directory file descriptor
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+OUTPUT:
+Parent Process: PID = 68902, waiting for child...
+Child Process: PID = 68903
+Exec failed: No such file or directory
+Child process completed.
+Files in the current directory:
+.
+..
+.bash_logout
+.bashrc
+.profile
