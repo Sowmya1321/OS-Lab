@@ -1,0 +1,142 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct allocate {
+    int pid, st_add, end_add;
+    struct allocate *next;
+};
+
+struct free_list {
+    int st_add, end_add;
+    struct free_list *next;
+};
+
+struct process {
+    int pid, size;
+};
+
+struct free_list *flist = NULL;
+struct allocate *alot = NULL;
+
+void display(struct allocate *a, struct free_list *f) {
+    printf("\nAllocated List:\n");
+    while (a) {
+        printf("Process: %d, Start: %d, End: %d\n", a->pid, a->st_add, a->end_add);
+        a = a->next;
+    }
+
+    printf("\nFree List:\n");
+    while (f) {
+        printf("Start: %d, End: %d\n", f->st_add, f->end_add);
+        f = f->next;
+    }
+}
+
+void insert(int p) {
+    struct free_list *temp_f;
+    struct allocate *new_alloc;
+    struct process pro[10];
+    int n = rand() % 10 + 1; 
+    for (int i = 0; i < n; i++) {
+        pro[i].pid = i + p;
+        pro[i].size = rand() % 550 + 1; 
+        printf("Inserting Process %d, Size: %d\n", pro[i].pid, pro[i].size);
+
+        temp_f = flist;
+        while (temp_f && temp_f->end_add - temp_f->st_add < pro[i].size) 
+            temp_f = temp_f->next;
+
+        if (temp_f) {
+            new_alloc = (struct allocate *)malloc(sizeof(struct allocate));
+            new_alloc->pid = pro[i].pid;
+            new_alloc->st_add = temp_f->st_add;
+            new_alloc->end_add = temp_f->st_add + pro[i].size;
+            temp_f->st_add = new_alloc->end_add;
+            new_alloc->next = alot;
+            alot = new_alloc;
+        } else {
+            printf("Not enough space for process %d\n", pro[i].pid);
+        }
+
+        display(alot, flist);
+    }
+}
+
+int main() {
+    srand((unsigned int)time(NULL));
+
+    flist = (struct free_list *)malloc(sizeof(struct free_list));
+    flist->st_add = 0;
+    flist->end_add = 1024;
+    flist->next = NULL;
+
+    insert(0);
+
+    return 0;
+}
+
+
+
+OUTPUT:
+Inserting Process 0, Size: 480
+
+Allocated List:
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 480, End: 1024
+Inserting Process 1, Size: 461
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+Inserting Process 2, Size: 503
+Not enough space for process 2
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+Inserting Process 3, Size: 301
+Not enough space for process 3
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+Inserting Process 4, Size: 271
+Not enough space for process 4
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+Inserting Process 5, Size: 479
+Not enough space for process 5
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+Inserting Process 6, Size: 428
+Not enough space for process 6
+
+Allocated List:
+Process: 1, Start: 480, End: 941
+Process: 0, Start: 0, End: 480
+
+Free List:
+Start: 941, End: 1024
+
