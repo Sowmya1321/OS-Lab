@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct allocate {
+    int pid, st_add, end_add;
+    struct allocate *next;
+};
+
+struct free_list {
+    int st_add, end_add;
+    struct free_list *next;
+};
+
+struct process {
+    int pid, size;
+};
+
+struct free_list *flist = NULL;
+struct allocate *alot = NULL;
+struct process pro[10];
+
+void display(struct allocate *a, struct free_list *f) {
+    printf("\nAllocated list:\n");
+    while (a) {
+        printf("PID:%d Start:%d End:%d\n", a->pid, a->st_add, a->end_add);
+        a = a->next;
+    }
+    printf("\nFree list:\n");
+    while (f) {
+        printf("Start:%d End:%d\n", f->st_add, f->end_add);
+        f = f->next;
+    }
+}
+
+void insert(int p) {
+    struct free_list *temp_f;
+    struct allocate *temp_a;
+    int i, n;
+    srand(time(NULL));
+    n = rand() % 10;
+    for (i = 0; i < n; i++) {
+        pro[i].pid = i + p;
+        pro[i].size = rand() % 550 + 1;
+    }
+    for (i = 0; i < n; i++) {
+        printf("\nProcess %d (Size: %d) inserting...\n", pro[i].pid, pro[i].size);
+        temp_f = flist;
+        while (temp_f && temp_f->end_add - temp_f->st_add < pro[i].size) {
+            temp_f = temp_f->next;
+        }
+
+        if (temp_f) {
+            temp_a = (struct allocate *)malloc(sizeof(struct allocate));
+            temp_a->pid = pro[i].pid;
+            temp_a->st_add = temp_f->st_add;
+            temp_a->end_add = temp_f->st_add + pro[i].size;
+            temp_f->st_add = temp_a->end_add;  
+            temp_a->next = alot;
+            alot = temp_a;
+        } else {
+            printf("Not enough space\n");
+        }
+
+        display(alot, flist);
+    }
+}
+
+void bestfit(int p) {
+    struct free_list *temp_f, *best_f;
+    struct allocate *temp_a;
+    int i, n, rem_space;
+    srand(time(NULL));
+    n = rand() % 10;
+    for (i = 0; i < n; i++) {
+        pro[i].pid = i + p;
+        pro[i].size = rand() % 200 + 1;
+    }
+    for (i = 0; i < n; i++) {
+        printf("\nBest Fit Process %d (Size: %d) inserting...\n", pro[i].pid, pro[i].size);
+        temp_f = flist;
+        best_f = NULL;
+        rem_space = 1024;
+
+        while (temp_f) {
+            if (temp_f->end_add - temp_f->st_add >= pro[i].size && (temp_f->end_add - temp_f->st_add - pro[i].size) < rem_space) {
+                rem_space = temp_f->end_add - temp_f->st_add - pro[i].size;
+                best_f = temp_f;
+            }
+            temp_f = temp_f->next;
+        }
+
+        if (best_f) {
+            temp_a = (struct allocate *)malloc(sizeof(struct allocate));
+            temp_a->pid = pro[i].pid;
+            temp_a->st_add = best_f->st_add;
+            temp_a->end_add = best_f->st_add + pro[i].size;
+            best_f->st_add = temp_a->end_add;
+            temp_a->next = alot;
+            alot = temp_a;
+        } else {
+            printf("Not enough space\n");
+        }
+
+        display(alot, flist);
+    }
+}
+
+void main() {
+    flist = (struct free_list *)malloc(sizeof(struct free_list));
+    flist->st_add = 0;
+    flist->end_add = 1024;
+    flist->next = NULL;
+
+    insert(0);
+    bestfit(10);
+}
+
+
+
+OUTPUT:
+Process 0 (Size: 231) inserting...
+
+Allocated list:
+PID:0 Start:0 End:231
+
+Free list:
+Start:231 End:1024
+
+Process 1 (Size: 472) inserting...
+
+Allocated list:
+PID:1 Start:231 End:703
+PID:0 Start:0 End:231
+
+Free list:
+Start:703 End:1024
+
+Process 2 (Size: 23) inserting...
+
+Allocated list:
+PID:2 Start:703 End:726
+PID:1 Start:231 End:703
+PID:0 Start:0 End:231
+
+Free list:
+Start:726 End:1024
+
+Best Fit Process 10 (Size: 131) inserting...
+
+Allocated list:
+PID:10 Start:726 End:857
+PID:2 Start:703 End:726
+PID:1 Start:231 End:703
+PID:0 Start:0 End:231
+
+Free list:
+Start:857 End:1024
+
+Best Fit Process 11 (Size: 172) inserting...
+Not enough space
+
+Allocated list:
+PID:10 Start:726 End:857
+PID:2 Start:703 End:726
+PID:1 Start:231 End:703
+PID:0 Start:0 End:231
+
+Free list:
+Start:857 End:1024
+
+Best Fit Process 12 (Size: 23) inserting...
+
+Allocated list:
+PID:12 Start:857 End:880
+PID:10 Start:726 End:857
+PID:2 Start:703 End:726
+PID:1 Start:231 End:703
+PID:0 Start:0 End:231
+
+Free list:
+Start:880 End:1024
+
+
