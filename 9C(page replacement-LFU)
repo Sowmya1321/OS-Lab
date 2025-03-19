@@ -17,27 +17,51 @@ int main()
     printf("\nThe Page Replacement Process is\n");
     for(i=0;i<m;i++)
     {
-        for(j=0;i<f;j++)
+        for(j=0;j<f;j++)
         if(rs[i]==a[j])
-        {
-            cntr[j]++;
-            break;
+       	{
+        	cntr[j]++;
+            	break;
         }
         if(j==f)
         {
             min=0;
             for(k=1;k<f;k++)
             if(cntr[k]<cntr[min])
-            min=k;
+            min=k;   	
             a[min]=rs[i];
             cntr[min]=1;
             pf++;
         }
         printf("\n");
         for(j=0;j<f;j++)
-        printf("\t%d",a[j]);
+        {
+        	printf("\t%d",a[j]);
+        }	
         if(j==f)
         printf("\tPF NO.%d",pf);
     }
     printf("\n\n Total number of page faults:%d",pf);
 }
+
+
+
+
+
+OUTPUT:
+Enter number of page references:5
+
+Enter the reference string:1 23 54 2 67
+
+Enter the available no.of frames:3
+
+The Page Replacement Process is
+
+	1	-1	-1	PF NO.1
+	1	23	-1	PF NO.2
+	1	23	54	PF NO.3
+	2	23	54	PF NO.4
+	67	23	54	PF NO.5
+
+ Total number of page faults:5
+
