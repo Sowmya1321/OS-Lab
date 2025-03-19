@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<string.h>
 struct fileTable
@@ -36,3 +37,24 @@ void main()
             printf("%d, ",ft[i].blocks[j]);
     }
 }
+
+
+
+
+
+OUTPUT:
+Enter no of files:2
+
+Enter file name 1:A
+Enter no of blocks in file 1:4
+Enter the blocks of the file:12 23 9 4
+
+Enter file name 2:G
+Enter no of blocks in file 2:5
+Enter the blocks of the file:88 77 66 55 44
+
+Enter the file name to be searched:G
+
+FILE NAME NO OF BLOCKS BLOCKS OCCUPIED
+ G		        5	    88, 77, 66, 55, 44
+
