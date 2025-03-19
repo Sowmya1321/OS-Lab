@@ -1,0 +1,59 @@
+
+   
+                free_alot=(struct free_list*)malloc(sizeof(struct free_list));
+                free_alot->st_add=temp_a->st_add;
+                free_alot->end_add=temp_a->end_add;
+                if(pre_f!=NULL)
+                pre_f->next=free_alot;
+                free_alot->next=temp_f;
+                if(flist==temp_f)
+                {
+                    flist=free_alot;
+                }
+            }
+            free(temp_a);
+        }
+        else printf("\n process not in memory");
+        temp_f=flist;
+        while(temp_f!=NULL)
+        {
+            if(temp_f->end_add==temp_f->next->st_add)
+            {
+                temp_f->end_add=temp_f->next->end_add;
+                temp_f->next=temp_f->next->next;
+            }
+            temp_f=temp_f->next;
+        }
+        display_alot(alot);
+        display_free(flist);
+    }
+    insert(10);
+}
+		
+			
+
+OUTPUT:
+Number of processes: 3
+Process 0, Size: 291
+Process 1, Size: 208
+Process 2, Size: 100
+Process 2, Start Address: 499, End Address: 599
+Process 1, Start Address: 291, End Address: 499
+Process 0, Start Address: 0, End Address: 291
+Free Block Start: 599, End: 1024
+Enter process ID to delete: 1
+
+Process 2, Start Address: 499, End Address: 599
+Process 0, Start Address: 0, End Address: 291
+Free Block Start: 291, End: 499
+Free Block Start: 599, End: 1024
+Number of processes: 2
+Process 10, Size: 18
+Process 11, Size: 188
+Process 11, Start Address: 309, End Address: 497
+Process 10, Start Address: 291, End Address: 309
+Process 2, Start Address: 499, End Address: 599
+Process 0, Start Address: 0, End Address: 291
+Free Block Start: 497, End: 499
+Free Block Start: 599, End: 1024
+
